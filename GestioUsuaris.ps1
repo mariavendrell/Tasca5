@@ -13,14 +13,16 @@ $bucle=$True
 while ($bucle -eq $True) {
     Write-Output "A quin usuari li vols canviar la foto?"
     $user = Read-Host "SID > "
-    get-aduser -Filter "SID -eq '$user'"
-    if ((get-aduser -Filter "SID -eq '$user'" | Format-Wide SID) -eq ($user) ) {
+    get-aduser -Filter "SID -eq '$user'" | Format-Wide SID
+    Write-Output $user
+    if ( ( (get-aduser -Filter "SID -eq '$user'" | Format-Wide SID) -eq "" )) {
         <# Action to perform if the condition is true #>
         Write-Host " hola"
+        $bucle = $False
     }
     else {
         <# Action when all if and elseif conditions are false #>
-        $bucle = $False
+        $bucle = $True
     }
 }
 
