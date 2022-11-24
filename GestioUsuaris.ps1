@@ -11,25 +11,36 @@ Get-ADUser -Filter * | Format-Table Name, SID
 #Triar usuari per canviar foto
 $bucle=$True
 while ($bucle -eq $True) {
-    Write-Output "A quin usuari li vols canviar la foto?"
-    $user = Read-Host "SID > "
-    get-aduser -Filter "SID -eq '$user'" | Format-Wide SID
-    Write-Output $user
-    if ( ( (get-aduser -Filter "SID -eq '$user'" | Format-Wide SID) -eq "" )) {
-        <# Action to perform if the condition is true #>
+    try {
+        Write-Output "A quin usuari li vols canviar la foto?"
+        $user = Read-Host "SID > "
+        get-aduser -Filter "SID -eq '$user'"
         Write-Host " hola"
         $bucle = $False
     }
-    else {
-        <# Action when all if and elseif conditions are false #>
+    catch {
+        {"No m'has donat un usuari correcte"}
         $bucle = $True
-    }
+    } 
 }
 
+#Canviar la foto
+$bucle=$True
+while ($bucle -eq $True) {
+    try {
+        Write-Output "La foto que m'has de donar no pot excedir de 96x96 píxels"
+        $foto=Read-Host "Ruta de la foto > "
+        Set-ADUser $user -Replace @{thumbnailPhoto=([byte[]](Get-Content $foto -Encoding byte))}
+        $bucle = $False
+    }
+    catch {
+        {"No m'has donat una ruta correcta correcte"}
+        $bucle = $True
+    } 
+}
 
-# Write-Output "La foto que m'has de donar no pot excedir de 96x96 píxels"
-# foto=Read-Host "Ruta de la foto > "
+#Usuaris treballan fora del seu horari
 
-
-
-#Set-ADUser M.Becker -Replace @{thumbnailPhoto=([byte[]](Get-Content "C:scriptsadm.becker.jpg" -Encoding byte))}
+#Getting users who haven't logged in in over 90 days
+#Filtering All enabled users who haven't logged in.
+Get-ADUser -Filter {((Enabled -eq $true) -and ((get-date -Format hh LastLogonDate) -lt $date))} -Properties LastLogonDate | select samaccountname, Name, LastLogonDate | Sort-Object LastLogonDate
