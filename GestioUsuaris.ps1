@@ -13,10 +13,17 @@ $bucle=$True
 while ($bucle -eq $True) {
     try {
         Write-Output "A quin usuari li vols canviar la foto?"
-        $user = Read-Host "SID > "
-        get-aduser -Filter "SID -eq '$user'"
-        Write-Host " hola"
-        $bucle = $False
+        $user = Read-Host "Name > "
+        if (get-aduser -Filter "Name -eq '$user'") {
+            <# Action to perform if the condition is true #>
+            $bucle = $False
+        }
+        else {
+            <# Action when all if and elseif conditions are false #>
+            {"No m'has donat un usuari correcte"}
+            $bucle = $True
+        }
+        
     }
     catch {
         {"No m'has donat un usuari correcte"}
@@ -43,4 +50,4 @@ while ($bucle -eq $True) {
 
 #Getting users who haven't logged in in over 90 days
 #Filtering All enabled users who haven't logged in.
-Get-ADUser -Filter {((Enabled -eq $true) -and ((get-date -Format hh LastLogonDate) -lt $date))} -Properties LastLogonDate | select samaccountname, Name, LastLogonDate | Sort-Object LastLogonDate
+#Get-ADUser -Filter {((Enabled -eq $true) -and ((get-date -Format hh LastLogonDate) -lt $date))} -Properties LastLogonDate | select samaccountname, Name, LastLogonDate | Sort-Object LastLogonDate
