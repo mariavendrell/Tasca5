@@ -11,6 +11,7 @@
 Get-ADUser -Filter * | Format-Table Name, SID
 
 #Triar usuari per canviar foto
+#Comprovo que l'usuari existeix
 $bucle=$True
 while ($bucle -eq $True) {
     try {
@@ -34,6 +35,8 @@ while ($bucle -eq $True) {
 }
 
 #Canviar la foto
+#Hem dona la ruta de la imatge i comprovo que existeix
+#Existeix la canvio
 $bucle=$True
 while ($bucle -eq $True) {
     try {
@@ -49,17 +52,15 @@ while ($bucle -eq $True) {
 }
 
 #Usuaris treballan fora del seu horari
-
+#Miro el lastlogon de cada usuari del sistema i comprovo que estigui dins del horari
 $usuaris=@(Get-ADUser -Filter * | select -ExpandProperty name)
-
 foreach ($usuari in $usuaris) {
     #Saber l'hora que l'usuari ha sortit de la seva sessió
     $hora = Get-ADUser -Identity $usuari -Properties LastLogon | Select @{Name='LastLogon';Expression={[DateTime]::FromFileTime($_.LastLogon)}} | Select-Object -ExpandProperty LastLogon | Get-Date -Format t
-
     #Si esta fora de horari(10 a 14 i de 15 a 18) 
     if ((($hora -gt '10:00') -AND ($hora -lt '13:00')) -OR (($now -gt '15:00') -AND ($now -lt '18:00'))) {
         <# Action to perform if the condition is true #>
-        
+        #No fa res
     }
     else {
         <# Action when all if and elseif conditions are false #>
