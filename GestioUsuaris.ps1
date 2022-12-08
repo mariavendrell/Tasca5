@@ -5,6 +5,8 @@
     a un fitxer de text de nom alerta.txt. És una acció simulada, per tant si no pots trobar usuaris dintre d'aquest rang d'hores pots canviar-ho.          
     *Cal tenir en compte que les imatges no poden excedir de 96x96 píxels ni ocupar més de 10KB d'espai al disc.        #>
 
+
+
 #Mostrar llistat d'usuaris
 Get-ADUser -Filter * | Format-Table Name, SID
 
@@ -48,6 +50,19 @@ while ($bucle -eq $True) {
 
 #Usuaris treballan fora del seu horari
 
-#Getting users who haven't logged in in over 90 days
-#Filtering All enabled users who haven't logged in.
-#Get-ADUser -Filter {((Enabled -eq $true) -and ((get-date -Format hh LastLogonDate) -lt $date))} -Properties LastLogonDate | select samaccountname, Name, LastLogonDate | Sort-Object LastLogonDate
+$usuaris=@(Get-ADUser -Filter * | select -ExpandProperty name)
+
+foreach ($usuari in $usuaris) {
+    #Saber l'hora que l'usuari ha sortit de la seva sessió
+    $hora = Get-ADUser -Identity $usuari -Properties LastLogon | Select @{Name='LastLogon';Expression={[DateTime]::FromFileTime($_.LastLogon)}} | Select-Object -ExpandProperty LastLogon | Get-Date -Format t
+
+    #Si esta fora de horari(10 a 14 i de 15 a 18) 
+    if ((($hora -gt '10:00') -AND ($hora -lt '13:00')) -OR (($now -gt '15:00') -AND ($now -lt '18:00'))) {
+        <# Action to perform if the condition is true #>
+        
+    }
+    else {
+        <# Action when all if and elseif conditions are false #>
+        Add-Content -Path .\alerta.txt -Value "L'usuari $usuari va iniciar sessió a les $hora"
+    }
+}
